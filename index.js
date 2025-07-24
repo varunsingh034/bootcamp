@@ -22,7 +22,6 @@ mongoose.connect(process.env.MONGODB_URL,{
 
 app.get('/products', async(req,res)=>{
     try{
-
         const products = await Product.find({});
         res.json(products);
 

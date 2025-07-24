@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const router = express.Router();
 
 
@@ -24,14 +24,15 @@ router.post('/auth/signup',async function (req,res){
             error: 'User already exists'
         })
     }
-    const hashPassword = await bcrypt.hash([password]);
+    const hashPassword = await bcrypt.hash( password, 10 );
     const user = new User ({
         email,
         password:hashPassword,
     })
     await user.save();
+  
     const token = jwt.sign({
-        userID:user_id
+        userID:user._id
     },'secret',{expiresIn:'1h'});
     res.status(200).json({token});
 
@@ -46,7 +47,7 @@ router.post('/auth/login',async function (req,res){
     const user = await User.findOne({email});
     if(user && await bcrypt.compare(password,user.password)){
         const token = jwt.sign({userID:user._id},'secret',{expiresIn:'1h'});
-        
+        res.status(200).json({ token });
     }
     else{
         res.status(400).json({error:'Invalid credentials'})
